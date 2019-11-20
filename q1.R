@@ -50,4 +50,13 @@ boxplot(time~menu,
         border="black"
 )
 
-plot(anova_results)
+# between-within plot
+B <- anova(lm(time ~ menu, data = dataset1))$"Mean Sq"
+names(B) <- c("between", "within")
+barplot(B, main = "Between vs. within")
+
+# Homogeneity of variances
+plot(anova_results, 1)
+
+# Normality plot
+plot(anova_results, 2)
