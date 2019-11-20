@@ -50,19 +50,40 @@ boxplot(time~menu,
         border="black"
 )
 
+# population distribution plots
+score <- dataset1[, "time"]
+group <- dataset1[, "menu"]
+means <- aggregate(dataset1[, "time"], list(dataset1$menu), mean)[, 2]
+xbot <- min(means) - 3
+xtop <- max(means) + 3
+plot(1, main = "Population distributions", xlim = c(xbot, xtop), ylim = c(0,0.45),
+     type="n", xlab="time", ylab="density")
+f <- function(x){dnorm(x, mean = means[1])}
+curve(f, from = means[1] - 3, to = means[1] + 3, add = TRUE, lwd = 2, col = "red")
+f <- function(x){dnorm(x, mean = means[2])}
+curve(f, from = means[2] - 3, to = means[2] + 3, add = TRUE, lwd = 2, col = "green")
+f <- function(x){dnorm(x, mean = means[3])}
+curve(f, from = means[3] - 3, to = means[3] + 3, add = TRUE, lwd = 2, col = "blue")
+f <- function(x){dnorm(x, mean = means[4])}
+curve(f, from = means[4] - 3, to = means[4] + 3, add = TRUE, lwd = 2, col = "yellow")
+rug(score[group == "controlmenu"], col = "red", lwd = 2, ticksize = 0.07, quiet = TRUE)
+rug(score[group == "flowmenu"], col = "green", lwd = 2, ticksize = 0.07, quiet = TRUE)
+rug(score[group == "toolglass"], col = "blue", lwd = 2, ticksize = 0.07, quiet = TRUE)
+rug(score[group == "toolpalette"], col = "yellow", lwd = 2, ticksize = 0.07, quiet = TRUE)
+
 # between-within plot
 B <- anova(lm(time ~ menu, data = dataset1))$"Mean Sq"
 names(B) <- c("between", "within")
-barplot(B, main = "Between vs. within")
+barplot(B, main = "Between vs. within", xlab = "Group (Menu)", ylab = "Sum of Squares (Time)")
 
-# f distn plots
+# f distribution plots
 means <- aggregate(dataset1[, "time"], list(dataset1$menu), mean)[, 2]
 cntr <- means - mean(means)
 lambda <- n*sum(cntr^2)
 f <- function(x) df(x, df1 = 2, df2 = 4*(n - 1))
 g <- function(x) df(x, df1 = 2, df2 = 4*(n - 1), ncp = lambda)
 uplim <- qf(0.975, df1 = 2, df2 = 4*(n - 1), ncp = lambda)
-curve(f, from = 0, to = uplim, lwd = 3, main = "(Non)central F dist'ns",
+curve(f, from = 0, to = uplim, lwd = 3, main = "F distributions plot",
       xlab = "F-ratio", ylab = "density")
 curve(g, from = 0, to = uplim, lwd = 3, col = "red", add = TRUE)
 fstat <- summary(lm(time ~ menu, data = dataset1))$fstatistic[1]
