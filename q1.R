@@ -55,6 +55,20 @@ B <- anova(lm(time ~ menu, data = dataset1))$"Mean Sq"
 names(B) <- c("between", "within")
 barplot(B, main = "Between vs. within")
 
+# f distn plots
+means <- aggregate(dataset1[, "time"], list(dataset1$menu), mean)[, 2]
+cntr <- means - mean(means)
+lambda <- n*sum(cntr^2)
+f <- function(x) df(x, df1 = 2, df2 = 4*(n - 1))
+g <- function(x) df(x, df1 = 2, df2 = 4*(n - 1), ncp = lambda)
+uplim <- qf(0.975, df1 = 2, df2 = 4*(n - 1), ncp = lambda)
+curve(f, from = 0, to = uplim, lwd = 3, main = "(Non)central F dist'ns",
+      xlab = "F-ratio", ylab = "density")
+curve(g, from = 0, to = uplim, lwd = 3, col = "red", add = TRUE)
+fstat <- summary(lm(time ~ menu, data = dataset1))$fstatistic[1]
+abline(v = fstat, lty = 2, col = "green", lwd = 3)
+par(mfrow = c(1,1))
+
 # Homogeneity of variances
 plot(anova_results, 1)
 
